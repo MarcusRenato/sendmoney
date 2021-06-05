@@ -12,6 +12,8 @@ class UserRepositoryFromEloquent implements UserRepository
     {
         $user = User::create($userDto->toArray());
 
+        $user->wallet()->create();
+
         return $user->id;
     }
 
