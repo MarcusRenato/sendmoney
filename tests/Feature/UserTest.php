@@ -7,21 +7,33 @@ use Tests\TestCase;
 
 class UserTest extends TestCase
 {
+    /**
+     * @var string[]
+     */
+    private array $payload;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->payload = [
+            'name'                  => 'Marcus',
+            'email'                 => 'marcusrenato@email.com',
+            'password'              => '123456',
+            'password_confirmation' => '123456',
+            'type'                  => 'comum',
+            'cpf_cnpj'              => '12344578977'
+        ];
+    }
+
     public function testIfTheUserWasCreated()
     {
         $response = $this->postJson(
             '/api/v1/user',
-            [
-                'name'                  => 'Marcus',
-                'email'                 => 'marcusrenato@email.com',
-                'password'              => '123456',
-                'password_confirmation' => '123456',
-                'type'                  => 'comum',
-                'cpf_cnpj'              => '12344578977'
-            ]
+            $this->payload
         );
 
-        $response->assertStatus(201)
+        $response->assertCreated()
             ->assertJson([
                 'data' => [
                     'id' => 1
@@ -31,15 +43,12 @@ class UserTest extends TestCase
 
     public function testIfParamsIsValidated(): void
     {
+        $data = $this->payload;
+        unset($data['name']);
+
         $response = $this->postJson(
             '/api/v1/user',
-            [
-                'email'                 => 'marcus@email.com',
-                'password'              => '123456',
-                'password_confirmation' => '123456',
-                'type'                  => 'comum',
-                'cpf_cnpj'              => '12344578966'
-            ]
+            $data
         );
 
         $response->assertStatus(422)
@@ -55,23 +64,14 @@ class UserTest extends TestCase
 
     public function testIfItDoesNotAllowTheCreationOfTwoUsersWithTheSameEmail(): void
     {
-        $payload = [
-            'name'                  => 'Marcus',
-            'email'                 => 'marcus@email.com',
-            'password'              => '123456',
-            'password_confirmation' => '123456',
-            'type'                  => 'comum',
-            'cpf_cnpj'              => '12344578966'
-        ];
-
-        $payloadModel = $payload;
+        $payloadModel = $this->payload;
         unset($payloadModel['password_confirmation']);
 
         User::factory()->create($payloadModel);
 
         $response = $this->postJson(
             '/api/v1/user',
-            $payload
+            $this->payload
         );
 
         $response->assertStatus(422)
