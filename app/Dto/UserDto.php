@@ -62,15 +62,15 @@ class UserDto
         }
 
         if (!isset($params['email'])) {
-            throw new DomainException(json_encode(['name' => ['Email is required.']]), 422);
+            throw new DomainException(json_encode(['email' => ['Email is required.']]), 422);
         }
 
         if (!isset($params['password'])) {
-            throw new DomainException(json_encode(['name' => ['Password is required.']]), 422);
+            throw new DomainException(json_encode(['password' => ['Password is required.']]), 422);
         }
 
         if (!isset($params['cpf_cnpj'])) {
-            throw new DomainException(json_encode(['name' => ['Cpf_cnpj is required.']]), 422);
+            throw new DomainException(json_encode(['cpf_cnpj' => ['Cpf_cnpj is required.']]), 422);
         }
 
         if (strtolower($params['type']) !== 'comum' && strtolower($params['type']) !== 'lojista') {
