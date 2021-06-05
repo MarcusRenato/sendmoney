@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,11 @@ Route::prefix('v1')->group(function () {
     // User
     Route::post('user', [UserController::class, 'store']);
 
+    // Transaction
+    Route::post('transaction', [TransactionController::class, 'create'])
+        ->middleware('auth:api');
+
+    // Auth
     Route::prefix('auth')->group(function () {
         Route::post('login', [AuthController::class, 'login']);
         Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:api');
