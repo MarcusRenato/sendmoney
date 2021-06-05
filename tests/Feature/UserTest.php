@@ -7,9 +7,6 @@ use Tests\TestCase;
 
 class UserTest extends TestCase
 {
-    /**
-     * @var string[]
-     */
     private array $payload;
 
     public function setUp(): void
