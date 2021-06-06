@@ -10,9 +10,47 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
+/**
+ * @OA\Schema(
+ *     title="User",
+ *     description="User model",
+ *     @OA\Xml(
+ *         name="User"
+ *     )
+ * )
+ */
 class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;
+
+    /**
+     * @OA\Property(type="string", example="Marcus")
+     */
+    private string $name;
+
+    /**
+     * @OA\Property(type="string", example="marcus@email.com")
+     */
+    private string $email;
+
+    /**
+     * @OA\Property(type="string", example="123456")
+     */
+    private string $password;
+
+    /**
+     * @OA\Property(
+     *     type="string",
+     *     enum={"comum", "lojista"},
+     *     example="comum"
+     * )
+     */
+    private string $type;
+
+    /**
+     * @OA\Property(type="string", example="014.113.145-66")
+     */
+    private string  $cpf_cnpj;
 
     protected $fillable = [
         'name',
