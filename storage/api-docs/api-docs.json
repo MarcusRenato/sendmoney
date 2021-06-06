@@ -1,0 +1,402 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Sendmoney",
+        "description": "Seu aplicativo para enviar dinheiro de forma fácil",
+        "contact": {
+            "email": "marcusrenato@live.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8888/api/v1",
+            "description": "Local"
+        }
+    ],
+    "paths": {
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login",
+                "description": "Returns user token",
+                "operationId": "loginUser",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "description": "application/json"
+                    },
+                    {
+                        "name": "Content-Type",
+                        "in": "header",
+                        "description": "application/json"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {},
+                            "example": {
+                                "email": "email@email.com",
+                                "password": "123456"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "headers": {
+                            "Content-Type": {
+                                "schema": {
+                                    "type": "application/json"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "data": {
+                                        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9....",
+                                        "token_type": "bearer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Data Input is invalid",
+                        "headers": {
+                            "Content-Type": {
+                                "schema": {
+                                    "type": "application/json"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "The given data was invalid.",
+                                    "errors": {
+                                        "email": [
+                                            "The email must be a valid email address."
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "headers": {
+                            "Content-Type": {
+                                "schema": {
+                                    "type": "application/json"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Incorrect email and/or password"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout",
+                "description": "Invalid User Token.",
+                "operationId": "logoutUser",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "description": "application/json",
+                        "example": "application/json"
+                    },
+                    {
+                        "name": "Content-Type",
+                        "in": "header",
+                        "description": "application/json",
+                        "example": "application/json"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "bearer {token}",
+                        "required": true,
+                        "example": "bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation.",
+                        "headers": {
+                            "Content-Type": {
+                                "schema": {
+                                    "type": "application/json"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "data": {
+                                        "message": "Successfully logged out."
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "headers": {
+                            "Content-Type": {
+                                "schema": {
+                                    "type": "application/json"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "Unauthenticated."
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/transaction": {
+            "post": {
+                "tags": [
+                    "Transactions"
+                ],
+                "summary": "Create a new transaction",
+                "description": "Returns transaction id",
+                "operationId": "createTransaction",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "description": "application/json"
+                    },
+                    {
+                        "name": "Content-Type",
+                        "in": "header",
+                        "description": "application/json"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "bearer {token}",
+                        "required": true,
+                        "example": "bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...."
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Transaction"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "json": {
+                                "example": {
+                                    "data": {
+                                        "message": "Successful transaction.",
+                                        "transaction_id": 1
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Data Input is invalid",
+                        "headers": {
+                            "Content-Type": {
+                                "schema": {
+                                    "type": "application/json"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "The given data was invalid.",
+                                    "errors": {
+                                        "payee": [
+                                            "The payee field is required."
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Store new User",
+                "description": "Returns user id",
+                "operationId": "storeUSer",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "description": "application/json"
+                    },
+                    {
+                        "name": "Content-Type",
+                        "in": "header",
+                        "description": "application/json"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/User"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "data": {
+                                        "id": 1
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Data Input is invalid",
+                        "headers": {
+                            "Content-Type": {
+                                "schema": {
+                                    "type": "application/json"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "message": "The given data was invalid.",
+                                    "errors": {
+                                        "name": [
+                                            "The name field is required."
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Transaction": {
+                "title": "Transaction",
+                "description": "Transaction model",
+                "properties": {
+                    "payee": {
+                        "description": "User id to receive value.",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "value": {
+                        "description": "Transaction amount.",
+                        "type": "float",
+                        "example": 10
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "Transaction"
+                }
+            },
+            "User": {
+                "title": "User",
+                "description": "User model",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Marcus"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "marcus@email.com"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "123456"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "comum",
+                            "lojista"
+                        ],
+                        "example": "comum"
+                    },
+                    "cpf_cnpj": {
+                        "type": "string",
+                        "example": "014.113.145-66"
+                    }
+                },
+                "type": "object",
+                "xml": {
+                    "name": "User"
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Users",
+            "description": "Users"
+        },
+        {
+            "name": "Auth",
+            "description": "Authenticate"
+        },
+        {
+            "name": "Transactions",
+            "description": "Transactions"
+        }
+    ],
+    "security": [
+        []
+    ]
+}
