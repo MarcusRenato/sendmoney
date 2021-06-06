@@ -2,17 +2,20 @@
 
 namespace Tests\Unit\Services;
 
+use App\Dto\CreateTransactionDto;
 use App\Dto\TransactionDto;
+use App\Jobs\SendNotification;
 use App\Repositories\Contracts\TransactionRepository;
 use App\Repositories\Contracts\UserRepository;
 use App\Repositories\Contracts\WalletRepository;
 use App\Services\TransactionService;
 use Exception;
 use Illuminate\Foundation\Testing\TestCase;
+use Illuminate\Support\Facades\Queue;
 use PHPUnit\Framework\MockObject\MockObject;
 use Tests\CreatesApplication;
 
-class TransactionTest extends TestCase
+class TransactionServiceTest extends TestCase
 {
     use CreatesApplication;
 
@@ -52,45 +55,62 @@ class TransactionTest extends TestCase
 
     public function testIfCreateTransactionIsSuccessful(): void
     {
-        $transactionDto = TransactionDto::populate($this->params);
+        $createTransactionDto = CreateTransactionDto::populate($this->params);
+        $transactionDto = TransactionDto::populate([
+            'payerName'  => 'Marcus',
+            'payeeName'  => 'Renato',
+            'payeeEmail' => 'renato@email.com',
+            'value'      => 10
+        ]);
 
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('userExistsById')
-            ->with($transactionDto->getPayee())
+            ->with($createTransactionDto->getPayee())
             ->willReturn(true);
 
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('isUserOrdinaryById')
-            ->with($transactionDto->getPayer())
+            ->with($createTransactionDto->getPayer())
             ->willReturn(true);
 
         $this->walletRepositoryMock
             ->expects(self::once())
             ->method('balanceByUserId')
-            ->with($transactionDto->getPayer())
+            ->with($createTransactionDto->getPayer())
             ->willReturn(15.0);
 
         $this->transactionRepositoryMock
             ->expects(self::once())
             ->method('create')
-            ->with($transactionDto)
+            ->with($createTransactionDto)
             ->willReturn(1);
 
         $this->walletRepositoryMock
             ->expects(self::once())
             ->method('payBalance')
-            ->with($transactionDto->getPayer(), $transactionDto->getValue())
+            ->with($createTransactionDto->getPayer(), $createTransactionDto->getValue())
             ->willReturn(true);
 
         $this->walletRepositoryMock
             ->expects(self::once())
             ->method('receiveBalance')
-            ->with($transactionDto->getPayee(), $transactionDto->getValue())
+            ->with($createTransactionDto->getPayee(), $createTransactionDto->getValue())
             ->willReturn(true);
 
+        $this->transactionRepositoryMock
+            ->expects(self::once())
+            ->method('getById')
+            ->willReturn($transactionDto);
+
+        Queue::fake();
+
+        SendNotification::dispatch($transactionDto);
+
         $response = $this->transactionService->create($this->params);
+
+        Queue::assertPushed(SendNotification::class);
 
         self::assertEquals(1, $response);
     }
@@ -99,42 +119,42 @@ class TransactionTest extends TestCase
     {
         self::expectException(Exception::class);
 
-        $transactionDto = TransactionDto::populate($this->params);
+        $createTransactionDto = CreateTransactionDto::populate($this->params);
 
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('userExistsById')
-            ->with($transactionDto->getPayee())
+            ->with($createTransactionDto->getPayee())
             ->willReturn(true);
 
         $this->userRepositoryMock
             ->expects(self::once())
             ->method('isUserOrdinaryById')
-            ->with($transactionDto->getPayer())
+            ->with($createTransactionDto->getPayer())
             ->willReturn(true);
 
         $this->walletRepositoryMock
             ->expects(self::once())
             ->method('balanceByUserId')
-            ->with($transactionDto->getPayer())
+            ->with($createTransactionDto->getPayer())
             ->willReturn(15.0);
 
         $this->transactionRepositoryMock
             ->expects(self::once())
             ->method('create')
-            ->with($transactionDto)
+            ->with($createTransactionDto)
             ->willReturn(1);
 
         $this->walletRepositoryMock
             ->expects(self::once())
             ->method('payBalance')
-            ->with($transactionDto->getPayer(), $transactionDto->getValue())
+            ->with($createTransactionDto->getPayer(), $createTransactionDto->getValue())
             ->willReturn(false);
 
         $this->walletRepositoryMock
             ->expects(self::once())
             ->method('receiveBalance')
-            ->with($transactionDto->getPayee(), $transactionDto->getValue())
+            ->with($createTransactionDto->getPayee(), $createTransactionDto->getValue())
             ->willReturn(false);
 
         $response = $this->transactionService->create($this->params);

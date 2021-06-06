@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class TransactionTest extends TestCase
@@ -59,6 +60,8 @@ class TransactionTest extends TestCase
             'Accept'        => 'application/json',
             'Authorization' => "bearer {$tokenUserOrdinary}"
         ];
+
+        Queue::fake();
     }
 
     public function testIfTransactionWorkCorrectly(): void
