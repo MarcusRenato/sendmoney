@@ -1,7 +1,7 @@
 version: "3.7"
-services: 
+services:
     app:
-        build: 
+        build:
             args:
                 user: marcus
                 uid: 1000
@@ -11,41 +11,48 @@ services:
         container_name: sendmoney-app
         restart: unless-stopped
         working_dir: /var/www/
-        volumes: 
+        volumes:
             - ./:/var/www
-        networks: 
+        networks:
             - sendmoney
 
     db:
         image: mysql:5.7
         container_name: sendmoney-db
         restart: unless-stopped
-        environment: 
+        environment:
             MYSQL_DATABASE: ${DB_DATABASE}
             MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
             MYSQL_PASSWORD: ${DB_PASSWORD}
             MYSQL_USER: ${DB_USERNAME}
             SERVICES_TAGS: dev
             SERVICE_NAME: mysql
-        ports: 
+        ports:
             - 3306:3306
-        volumes: 
+        volumes:
             - ./docker-compose/mysql:/docker-entrypoint-initdb.d
-        networks: 
+        networks:
             - sendmoney
 
     nginx:
         image: nginx:1.17-alpine
         container_name: sendmoney-nginx
         restart: unless-stopped
-        ports: 
+        ports:
             - 8888:80
-        volumes: 
+        volumes:
             - ./:/var/www
             - ./docker-compose/nginx/:/etc/nginx/conf.d
-        networks: 
+        networks:
             - sendmoney
+    redis:
+        image: redis:alpine
+        container_name: sendmoney-redis
+        ports:
+        - 6379:6379
+        networks:
+          - sendmoney
 
-networks: 
+networks:
     sendmoney:
         driver: bridge

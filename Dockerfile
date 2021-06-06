@@ -32,6 +32,9 @@ RUN useradd -G www-data,root -u $uid -d /home/$user $user
 RUN mkdir -p /home/$user/.composer && \
     chown -R $user:$user /home/$user
 
+# Redis
+COPY ./docker-compose/redis/redis.conf /usr/local/etc/redis/redis.conf
+
 # Diretório de trabalho
 WORKDIR /var/www
 
