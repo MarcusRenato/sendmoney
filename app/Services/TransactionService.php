@@ -65,7 +65,10 @@ class TransactionService
                 $createTransactionDto->getValue()
             );
 
-            if (! $responsePayInsert  && ! $responseReceiveInsert) {
+            if (
+                (! $responsePayInsert  && ! $responseReceiveInsert)
+                || (! $responsePayInsert || !$responseReceiveInsert)
+            ) {
                 throw new Exception(json_encode(
                         ['message' => 'An error has occurred and the transaction cannot be completed.']
                     ),
