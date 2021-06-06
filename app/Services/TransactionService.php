@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Dto\CreateTransactionDto;
 use App\Dto\TransactionDto;
+use App\Jobs\SendNotification;
 use App\Repositories\Contracts\TransactionRepository;
 use App\Repositories\Contracts\UserRepository;
 use App\Repositories\Contracts\WalletRepository;
@@ -26,13 +28,13 @@ class TransactionService
     public function create(array $params): int
     {
         try {
-            $transactionDto = TransactionDto::populate($params);
+            $createTransactionDto = CreateTransactionDto::populate($params);
 
-            $this->checkTransactionIsAble($transactionDto);
+            $this->checkTransactionIsAble($createTransactionDto);
 
-            $walletPayer = $this->balanceInMyWalletByUserId($transactionDto->getPayer());
+            $walletPayer = $this->balanceInMyWalletByUserId($createTransactionDto->getPayer());
 
-            if ($walletPayer < $transactionDto->getValue()) {
+            if ($walletPayer < $createTransactionDto->getValue()) {
                 throw new Exception(
                     json_encode(
                         ['message' => 'You do not have enough value in your wallet to carry out the transfer.']
@@ -51,16 +53,16 @@ class TransactionService
             }
 
             DB::beginTransaction();
-            $transactionId = $this->transactionRepository->create($transactionDto);
+            $transactionId = $this->transactionRepository->create($createTransactionDto);
 
             $responsePayInsert = $this->walletRepository->payBalance(
-                $transactionDto->getPayer(),
-                $transactionDto->getValue()
+                $createTransactionDto->getPayer(),
+                $createTransactionDto->getValue()
             );
 
             $responseReceiveInsert = $this->walletRepository->receiveBalance(
-                $transactionDto->getPayee(),
-                $transactionDto->getValue()
+                $createTransactionDto->getPayee(),
+                $createTransactionDto->getValue()
             );
 
             if (! $responsePayInsert  && ! $responseReceiveInsert) {
@@ -70,6 +72,10 @@ class TransactionService
                     422
                 );
             }
+
+            $transactionDto = $this->getTransactionById($transactionId);
+
+            $this->sendNotification($transactionDto);
 
             DB::commit();
 
@@ -96,30 +102,30 @@ class TransactionService
         return $this->userRepository->isUserOrdinaryById($userId);
     }
 
-    private function checkTransactionIsAble(TransactionDto $transactionDto): void
+    private function checkTransactionIsAble(CreateTransactionDto $createTransactionDto): void
     {
-        if (! $this->isUserOrdinary($transactionDto->getPayer())) {
+        if (! $this->isUserOrdinary($createTransactionDto->getPayer())) {
             throw new Exception(
                 json_encode(['message' => 'You cannot transfer.']),
                 422
             );
         }
 
-        if ($transactionDto->getPayer() === $transactionDto->getPayee()) {
+        if ($createTransactionDto->getPayer() === $createTransactionDto->getPayee()) {
             throw new Exception(
                 json_encode(['message' => 'You cannot make a transfer to yourself.']),
                 422
             );
         }
 
-        if (! $this->checkIfUserExists($transactionDto->getPayee())) {
+        if (! $this->checkIfUserExists($createTransactionDto->getPayee())) {
             throw new Exception(
-                json_encode(['message' => "User '{$transactionDto->getPayee()}' not found."]),
+                json_encode(['message' => "User '{$createTransactionDto->getPayee()}' not found."]),
                 422
             );
         }
 
-        if ($transactionDto->getValue() <= 0) {
+        if ($createTransactionDto->getValue() <= 0) {
             throw new Exception(
                 json_encode(['message' => 'Value must be greater than 0.']),
                 422
@@ -136,5 +142,15 @@ class TransactionService
         }
 
         return true;
+    }
+
+    private function sendNotification(TransactionDto $transactionDto): void
+    {
+        SendNotification::dispatch($transactionDto);
+    }
+
+    private function getTransactionById(int $transactionId): TransactionDto
+    {
+        return $this->transactionRepository->getById($transactionId);
     }
 }
