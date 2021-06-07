@@ -14,18 +14,27 @@ API utilizadas no desenvolvimento:
 
 ## Instalação
 
-Requer: Docker
+Requerimentos para iniciar aplicação: `Docker`
 
 ```sh
 git clone https://github.com/MarcusRenato/sendmoney.git
 cd sendmoney
-cp .env.example
+cp .env.example .env
 docker-compose up -d
 docker-compose run --rm app composer install
 docker-compose run --rm app php artisan key:generate
 docker-compose run --rm app php artisan jwt:secret
 docker-compose run --rm app php artisan migrate
 ```
+
+A aplicação estará disponível no link: `http://localhost:8888`
+
+### Documentação API
+Para gerar a documentação da API insira o comando:
+```
+docker-compose run --rm app php artisan l5-swagger:generate
+```
+A Documentação pode ser acessada pelo link: `http://localhost:8888/api/documentation`
 
 
 ## Tests
