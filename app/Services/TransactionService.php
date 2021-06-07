@@ -69,9 +69,10 @@ class TransactionService
                 (! $responsePayInsert  && ! $responseReceiveInsert)
                 || (! $responsePayInsert || !$responseReceiveInsert)
             ) {
-                throw new Exception(json_encode(
-                        ['message' => 'An error has occurred and the transaction cannot be completed.']
-                    ),
+                throw new Exception(
+                    json_encode(
+                    ['message' => 'An error has occurred and the transaction cannot be completed.']
+                ),
                     422
                 );
             }

@@ -1,8 +1,6 @@
 <?php
 
-
 namespace App\Repositories\Eloquent;
-
 
 use App\Models\Wallet;
 use App\Repositories\Contracts\WalletRepository;
@@ -33,10 +31,12 @@ class WalletRepositoryFromDoctrine implements WalletRepository
         $wallet = $this->wallet->where('user_id', $walletOwnerId)->first();
 
         if (! $wallet instanceof Wallet) {
-            throw new Exception(json_encode([
+            throw new Exception(
+                json_encode([
                 'message' => "Wallet for user {$walletOwnerId} not found."
             ]),
-                422);
+                422
+            );
         }
 
         return $wallet->update([
@@ -49,10 +49,12 @@ class WalletRepositoryFromDoctrine implements WalletRepository
         $wallet = $this->wallet->where('user_id', $walletOwnerId)->first();
 
         if (! $wallet instanceof Wallet) {
-            throw new Exception(json_encode([
+            throw new Exception(
+                json_encode([
                 'message' => "Wallet for user {$walletOwnerId} not found."
             ]),
-            422);
+                422
+            );
         }
 
         return $wallet->update([

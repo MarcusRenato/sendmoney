@@ -11,7 +11,7 @@ function validatorCpf(string $value): bool
     return true;
 }
 
-function validatorCnpj (string $value): bool
+function validatorCnpj(string $value): bool
 {
     $value = str_replace(['-', ' ', '.', '/'], [''], $value);
 
