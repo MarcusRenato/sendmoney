@@ -18,12 +18,7 @@ class WalletRepositoryFromDoctrine implements WalletRepository
         $wallet = $this->wallet->where('user_id', $userId)->first();
 
         if (! $wallet instanceof Wallet) {
-            throw new Exception(
-                (string) json_encode([
-                    'message' => "Wallet for user {$userId} not found."
-                ]),
-                422
-            );
+            $this->throwWalletNotFoundException($userId);
         }
 
         return $wallet->value;
@@ -34,12 +29,7 @@ class WalletRepositoryFromDoctrine implements WalletRepository
         $wallet = $this->wallet->where('user_id', $walletOwnerId)->first();
 
         if (! $wallet instanceof Wallet) {
-            throw new Exception(
-                (string) json_encode([
-                    'message' => "Wallet for user {$walletOwnerId} not found."
-                ]),
-                422
-            );
+            $this->throwWalletNotFoundException($walletOwnerId);
         }
 
         return $wallet->update([
@@ -52,16 +42,22 @@ class WalletRepositoryFromDoctrine implements WalletRepository
         $wallet = $this->wallet->where('user_id', $walletOwnerId)->first();
 
         if (! $wallet instanceof Wallet) {
-            throw new Exception(
-                (string) json_encode([
-                    'message' => "Wallet for user {$walletOwnerId} not found."
-                ]),
-                422
-            );
+            $this->throwWalletNotFoundException($walletOwnerId);
         }
 
         return $wallet->update([
             'value' => $wallet->value - $value
         ]);
+    }
+
+    /** @throws Exception */
+    private function throwWalletNotFoundException(int $walletOwnerId): void
+    {
+        throw new Exception(
+            (string) json_encode([
+                'message' => "Wallet for user '{$walletOwnerId}' not found."
+            ]),
+            422
+        );
     }
 }
