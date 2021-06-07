@@ -35,5 +35,3 @@ Route::prefix('v1')->group(function () {
         Route::post('logout', [AuthController::class, 'logout'])->middleware('auth:api');
     });
 });
-
-Route::get('/teste', fn() => response()->json(['ok' => true]));
