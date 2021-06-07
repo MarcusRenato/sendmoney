@@ -18,9 +18,12 @@ class WalletRepositoryFromDoctrine implements WalletRepository
         $wallet = $this->wallet->where('user_id', $userId)->first();
 
         if (! $wallet instanceof Wallet) {
-            throw new Exception(json_encode([
-                'message' => "Wallet for user {$userId} not found."
-            ]), 422);
+            throw new Exception(
+                (string) json_encode([
+                    'message' => "Wallet for user {$userId} not found."
+                ]),
+                422
+            );
         }
 
         return $wallet->value;
@@ -32,9 +35,9 @@ class WalletRepositoryFromDoctrine implements WalletRepository
 
         if (! $wallet instanceof Wallet) {
             throw new Exception(
-                json_encode([
-                'message' => "Wallet for user {$walletOwnerId} not found."
-            ]),
+                (string) json_encode([
+                    'message' => "Wallet for user {$walletOwnerId} not found."
+                ]),
                 422
             );
         }
@@ -50,9 +53,9 @@ class WalletRepositoryFromDoctrine implements WalletRepository
 
         if (! $wallet instanceof Wallet) {
             throw new Exception(
-                json_encode([
-                'message' => "Wallet for user {$walletOwnerId} not found."
-            ]),
+                (string) json_encode([
+                    'message' => "Wallet for user {$walletOwnerId} not found."
+                ]),
                 422
             );
         }

@@ -27,7 +27,7 @@ class SendNotification implements ShouldQueue
     {
         $url = 'http://o4d9z.mocklab.io/notify';
 
-        $response = (array) json_decode(file_get_contents($url));
+        $response = (array) json_decode((string) file_get_contents($url));
 
         if ($response['message'] === 'Success') {
             // Envio do e-mail...

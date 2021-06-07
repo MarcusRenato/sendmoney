@@ -52,27 +52,27 @@ class CreateTransactionDto
     private static function validate(array $params): void
     {
         if (! isset($params['payee'])) {
-            throw new DomainException(json_encode(['payee' => ['Payee is required.']]), 422);
+            throw new DomainException((string) json_encode(['payee' => ['Payee is required.']]), 422);
         }
 
         if (! isset($params['payer'])) {
-            throw new DomainException(json_encode(['payer' => ['Payer is required.']]), 422);
+            throw new DomainException((string) json_encode(['payer' => ['Payer is required.']]), 422);
         }
 
         if (! isset($params['value'])) {
-            throw new DomainException(json_encode(['value' => ['Value is required.']]), 422);
+            throw new DomainException((string) json_encode(['value' => ['Value is required.']]), 422);
         }
 
         if (! filter_var($params['payee'], FILTER_VALIDATE_INT)) {
-            throw new InvalidArgumentException(json_encode(['payee' => ['Payee is not valid.']]), 422);
+            throw new InvalidArgumentException((string) json_encode(['payee' => ['Payee is not valid.']]), 422);
         }
 
         if (! filter_var($params['payer'], FILTER_VALIDATE_INT)) {
-            throw new InvalidArgumentException(json_encode(['payer' => ['Payer is not valid.']]), 422);
+            throw new InvalidArgumentException((string) json_encode(['payer' => ['Payer is not valid.']]), 422);
         }
 
         if (! filter_var($params['value'], FILTER_VALIDATE_FLOAT)) {
-            throw new InvalidArgumentException(json_encode(['value' => ['Value is not valid.']]), 422);
+            throw new InvalidArgumentException((string) json_encode(['value' => ['Value is not valid.']]), 422);
         }
     }
 }

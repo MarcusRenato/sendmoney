@@ -22,7 +22,10 @@ class UserService
             $userDto = UserDto::populate($params);
 
             if ($this->userExists($userDto->getEmail(), $userDto->getCpfCnpj())) {
-                throw new Exception(json_encode(['user' => 'User already exists.']), 422);
+                throw new Exception(
+                    (string) json_encode(['user' => 'User already exists.']),
+                    422
+                );
             }
 
             return $this->userRepository->store($userDto);

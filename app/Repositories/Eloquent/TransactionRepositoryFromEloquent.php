@@ -40,8 +40,18 @@ class TransactionRepositoryFromEloquent implements TransactionRepository
             )
             ->join('users AS payer', 'transactions.payer_id', '=', 'payer.id')
             ->join('users AS payee', 'transactions.payee_id', '=', 'payee.id')
-            ->first()
-            ->toArray();
+            ->first();
+
+        if (!$transaction instanceof Transaction) {
+            throw new Exception(
+                (string) json_encode([
+                    'message' => "Transaction '{$transactionId}' not found."
+                ]),
+                422
+            );
+        }
+
+        $transaction = $transaction->toArray();
 
         return TransactionDto::populate($transaction);
     }

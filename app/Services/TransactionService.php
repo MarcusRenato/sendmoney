@@ -36,7 +36,7 @@ class TransactionService
 
             if ($walletPayer < $createTransactionDto->getValue()) {
                 throw new Exception(
-                    json_encode(
+                    (string) json_encode(
                         ['message' => 'You do not have enough value in your wallet to carry out the transfer.']
                     ),
                     422
@@ -45,7 +45,7 @@ class TransactionService
 
             if (! $this->checkTransactionIsApproved()) {
                 throw new Exception(
-                    json_encode(
+                    (string) json_encode(
                         ['message' => 'Transaction not approved.']
                     ),
                     422
@@ -70,9 +70,9 @@ class TransactionService
                 || (! $responsePayInsert || !$responseReceiveInsert)
             ) {
                 throw new Exception(
-                    json_encode(
-                    ['message' => 'An error has occurred and the transaction cannot be completed.']
-                ),
+                    (string) json_encode(
+                        ['message' => 'An error has occurred and the transaction cannot be completed.']
+                    ),
                     422
                 );
             }
@@ -110,28 +110,28 @@ class TransactionService
     {
         if (! $this->isUserOrdinary($createTransactionDto->getPayer())) {
             throw new Exception(
-                json_encode(['message' => 'You cannot transfer.']),
+                (string) json_encode(['message' => 'You cannot transfer.']),
                 422
             );
         }
 
         if ($createTransactionDto->getPayer() === $createTransactionDto->getPayee()) {
             throw new Exception(
-                json_encode(['message' => 'You cannot make a transfer to yourself.']),
+                (string) json_encode(['message' => 'You cannot make a transfer to yourself.']),
                 422
             );
         }
 
         if (! $this->checkIfUserExists($createTransactionDto->getPayee())) {
             throw new Exception(
-                json_encode(['message' => "User '{$createTransactionDto->getPayee()}' not found."]),
+                (string) json_encode(['message' => "User '{$createTransactionDto->getPayee()}' not found."]),
                 422
             );
         }
 
         if ($createTransactionDto->getValue() <= 0) {
             throw new Exception(
-                json_encode(['message' => 'Value must be greater than 0.']),
+                (string) json_encode(['message' => 'Value must be greater than 0.']),
                 422
             );
         }
@@ -139,7 +139,7 @@ class TransactionService
 
     private function checkTransactionIsApproved(): bool
     {
-        $response = (array) json_decode(file_get_contents(self::BASE_URL));
+        $response = (array) json_decode((string) file_get_contents(self::BASE_URL));
 
         if ($response['message'] !== 'Autorizado') {
             return false;

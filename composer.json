@@ -22,6 +22,8 @@
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^5.0",
+        "nunomaduro/larastan": "^0.7.6",
+        "phpstan/phpstan": "^0.12.88",
         "phpunit/phpunit": "^9.3.3"
     },
     "autoload": {
@@ -50,8 +52,19 @@
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
         ],
+        "php-check": [
+            "@cs-fix",
+            "@analyse",
+            "@tests"
+        ],
         "cs-fix": [
             "vendor/bin/php-cs-fixer fix app"
+        ],
+        "analyse": [
+            "vendor/bin/phpstan analyse app --memory-limit=4000M phpstan.neon"
+        ],
+        "tests": [
+            "@php artisan test"
         ]
     },
     "extra": {
