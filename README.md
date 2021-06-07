@@ -42,6 +42,9 @@ Caso prefira, para a executar o php-cs-fix, phpstan e os testes, no mesmo comand
 docker-compose run --rm app composer php-check
 ```
 
+### Observações
+- Por padrão todo usuário criado via api inicia com o valor de $150 na carteira.
+
 ## Tests
 
 Para executar os tests unitários e de api:
