@@ -3,7 +3,7 @@
 
 ## Tecnologias
 
-API utilizadas no desenvolvimento:
+Api desenvolvida com as seguintes tecnologias e ferramentas:
 
 - PHP
 - Laravel
@@ -36,6 +36,11 @@ docker-compose run --rm app php artisan l5-swagger:generate
 ```
 A Documentação pode ser acessada pelo link: `http://localhost:8888/api/documentation`
 
+### Estilo, Análise e Testes
+Caso prefira, para a executar o php-cs-fix, phpstan e os testes, no mesmo comando, utilize o seguinte comando:
+```
+docker-compose run --rm app composer php-check
+```
 
 ## Tests
 
